@@ -10,7 +10,7 @@ X10DEV = "/dev/ttyUSB0"
 X10ADDRESS = "3"
 
 
-macs = { 
+macs = {
   '00:1D:4F:8C:34:CE' => {
     :name => 'jezebel',
     :found => false,
@@ -35,7 +35,7 @@ class X10
     puts "run: " + cmd
     system(cmd)
   end
-  
+
   def self.off
     cmd = BR + " --port=" + X10DEV + " --off=" + X10ADDRESS
     puts "run: " + cmd
@@ -43,17 +43,17 @@ class X10
   end
 end
 
-class DeviceTracker  
+class DeviceTracker
   @num_devices = 0
   def self.found
     if @num_devices == 0
-      puts "turning on" 
+      puts "turning on"
       X10.on
     end
     @num_devices += 1
     puts "#{@num_devices} found"
   end
-  
+
   def self.lost
     @num_devices -= 1
     if @num_devices == 0
@@ -63,7 +63,7 @@ class DeviceTracker
     puts "#{@num_devices} found"
   end
 end
-  
+
 def check_available(mac, config)
   cmd = L2PING + " -c 1 " + mac
   puts "run: #{cmd}" if DEBUG
@@ -72,7 +72,7 @@ def check_available(mac, config)
       puts line if DEBUG
     end
   end
-  
+
   elapsed = Time.now - config[:last_seen]
   retry_time = nil
   if $? == 0 # found
@@ -92,7 +92,7 @@ def check_available(mac, config)
     end
     retry_time = config[:missing_poll_time]
   end
-  EM::Timer.new(retry_time) do 
+  EM::Timer.new(retry_time) do
     check_available(mac, config)
   end
 end
