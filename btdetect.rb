@@ -1,5 +1,39 @@
 #!/usr/bin/env ruby
 
+# The basic idea is that I want the lights at my desk to come on if
+# I'm there, and turn off if I'm not.  This saves some power, but also
+# keeps the janitors from turning off my lights and requiring me to
+# turn them on by hand each morning.
+#
+# The way this works is that the BT MAC address for my phone and MBP
+# are configured below.  It uses the l2ping program to issue a layer 2
+# ping to each of these to determine if they're within range.  If
+# either of them are found, then the assumption is that I'm at my
+# desk, and the lights are turned on.  If both are missing, then the
+# assumption is that I'm not at my desk, and the lights are turned
+# off.
+#
+# For each device I can configure how often to try to ping it based on
+# whether or not the device was present or not last time we tested.
+# This is so that when my phone is in range, I'm not pinging it every
+# second and killing the battery.
+#
+# To turn the lights on and off, I use an X10 controller with each of
+# the 3 lights plugged into it, and the "br" program to control the
+# X10 device.  I originally tried using the rubygem x10-cm17a, but
+# found it to be unreliable.
+#
+# The reason I'm using l2ping instead of something like hcitool is
+# that hcitool uses the caches that bluetoothd maintains, and I
+# couldn't figure out a good way to turn off the caches, or configure
+# how long items lived in the caches.  Also, l2ping returns a response
+# much faster than hcitool does for uncached entries.  Using an
+# ancient D-link USB BT dongle, it takes about 1-1.5 seconds to get
+# setup, and then 1 second per ping.
+#
+# This is all pretty gross and has too much stuff hard coded, but it
+# was a quick and dirty hack.
+
 require 'rubygems'
 require 'eventmachine'
 
